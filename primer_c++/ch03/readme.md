@@ -82,6 +82,110 @@ cout << s << endl;
 无论何时使用字符串的下标，都应该注意检查其合法性。
 
 
+## 标准库类型vector
+
+```c++
+#include <vector>
+using std::vector;
+```
+
+### 定义和初始化 vector 对象
+#### 列表初始化 vector 对象
+```c++
+vector<string> articles = {"a", "an", "the"};
+```
+
+#### 创建指定数量的元素
+```c++
+vector<int> ivec(10, -1);
+
+vector<string> svec(10, "hi");
+```
+
+#### 值初始化
+
+#### 列表初始值还是元素数量?
+```c++
+vector<int> v1(10); // v1有10个元素，每个的值都是0
+
+vector<int> v2{10}; // v2有一个元素，该元素的值为10
+
+vector<int> v3(10, 1); // v3有是个元素，每个的值都为1
+
+vector<int> v4{10, 1}; // v4有2个元素，值分别为10和1
+```
+圆括号提供的值是用来构造vector对象
+
+花括号用来表述列表初始化vector对象
+
+### 向 vector 对象中添加元素
+vector 的成员函数 `push_back` 向其中添加对象，放入尾部
+
+#### 向 vector 对象添加元素蕴含的编程假定
+范围for语句体内不应改变其所遍历序列的大小
+
+### 其他 vector 操作
+#### 计算vector内对象的索引
+使用下标运算符能获取到指定的元素，vector对象的下标从0开始，下标的类型是相应的`size_type`类型
+```c++
+vector<int>::size_type; // 正确
+
+vector::size_type; // 错误
+```
+
+#### 不能用下标形式添加元素
+vector 对象（以及 string 对象）的下标运算符可用于访问已存在的元素，而不能用于添加元素
+
+```c++
+#include <iostream>
+#include <vector>
+
+using std::cin;
+using std::cout;
+using std::cerror;
+using std::endl;
+using std::vector;
+
+int main()
+{
+  vector<int> ivec;
+  int i;
+  while (cin >> i)
+  {
+    ivec.push_bak(i);
+  }
+  
+  for (int i = 0; i < ivec.size() - 1; i++) 
+  {
+    cout << ivec[i] + ivec[i+1] << endl;
+  }
+  
+  cout << "=======================" << endl;
+  
+  int left = 0;
+  int right = ivec.size() - 1;
+  while (left < right) 
+  {
+    cout << ivec[left] + ivec[right];
+    left++;
+    right--;
+  }
+  
+  return 0;
+}
+
+```
+
+
+
+
+
+
+
+
+
+
+
 
 
 
