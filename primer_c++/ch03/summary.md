@@ -176,17 +176,79 @@ int main()
 
 ```
 
+## 迭代器介绍
+### 使用迭代器
+有迭代器的类型同时拥有返回迭代器的成员
 
+**`begin`** 成员负责返回指向第一个元素（或第一个字符）的迭代器
 
+**`end`** 成员则负责返回指向容器（或string对象）“尾元素的下一位置（pne past the end）”的迭代器，`end`成员返回的迭代器通常被称作为**尾后迭代器**（off-the-end iterator）或简称为尾迭代器（end-iterator）
 
+如果容器为空，则begin和end返回的是同一个迭代器，都是尾后迭代器
 
+```c++
+auto b = v.begin(), e = v.end();
+```
 
+#### 迭代器运算符
+```c++
+string s("some thing");
+while(s.begin() != s.end())
+{
+  auto it = s.begin();
+  *it = toupper(*it)
+}
+```
 
+#### 将迭代器从一个元素移动到另外一个元素
+```c++
+// 依次处理s的字符直至字符串或者遇到空白
+for (auto it = s.begin(); it != s.end() && !isspace(*it); ++it)
+{
+  *it = toupper(*it);
+}
+```
 
+#### 迭代器类型
+拥有迭代器的标准库类型使用iterator和const_iterator来表示迭代器类型
+```c++
+vector<int>::iterator it; // it 能读写vector<int>的元素
 
+string::iterator it2; // it2 能读写string对象中的字符
 
+vector<int>::const_iterator it3; // it3 只能读元素，不能写元素
 
+string::const_iterator it4; // it4 只能读字符，不能写字符
+```
 
+#### begin 和 end 运算符
+`cbegin()`函数返回的是const_iterator
 
+#### 结合解引用和成员访问操作
+**箭头运算符（->）**将解引用和成员访问两个操作结合在一起
+```c++
+for (auto it = text.cbegin(); it != text.cend() && !it -> empty(); ++it)
+{
+  cout << *it << endl;
+}
+```
 
+### 迭代器运算
+`iter1 - iter2`:两个迭代器相减的结果是它们之间的距离，其类型名为**difference_type**，是一个带符号整型数。
+
+```c++
+// 二分查找
+auto begin = text.begin(), end = text.end();
+auto mid = text.begin() + (end - begin) / 2;
+
+while (mid != end && *mid != sought)
+{
+  if (sought < *mid)
+    end = mid;
+  else
+    begin = mid + 1;
+  
+  mid = begin + (end - begin) / 2;
+}
+```
 
