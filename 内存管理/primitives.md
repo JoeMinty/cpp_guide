@@ -16,7 +16,6 @@ catch (std::bad_alloc) {
 }
 
 
-
 void *operator new(size_t size, const std::nothrow_t&) 
 {
   void *p;
@@ -200,3 +199,81 @@ void Screen::operator delete(void *p, size_t)
     freeStore = static_cast<Screen*>(p); 
 }
 ```
+
+**demo3  static allocator**
+```c++
+class allocator 
+{
+private:
+    struct obj {
+        struct obj* next;
+    };
+public:
+    void* allocate(size_t);
+    void deallocate(void*, size_t);
+private:
+    obj* freeStore = nullptr;
+    const int CHUNK = 5;
+}
+
+void* allocator::allocate(size_t size)
+{
+    obj* p;
+    if (!freeStore) {
+        // linked list 为空，于是申请一大块内存
+        size_t chunk = CHUNK * size;
+        freeStore = p = (obj*) malloc(chunk);
+
+        // 将分配得到的一大块当作linked list使用
+        // 小块小块串起来
+        for (int i = 0; i < CHUNK - 1; i++)
+        {
+            /* 嵌入式指针设计 */
+            p->next = (obj*)((char*)p + size);
+            p = p->next;
+        }
+        p->next = nullptr;
+    }
+
+    p = freeStore;
+    freeStore = freeStore->next;
+    return p;
+}
+
+void allocator::deallocate(void* p, sizt_t size)
+{
+    ((obj*)p)->next = freeStore;
+    freeStore = (obj*)p;
+}
+
+class Foo {
+public:
+    long L;
+    string str;
+    static allocator myAlloc;
+public:
+    Foo(long l): L(l) {}
+    static void* operator new(size_t size) {
+        return myAlloc.allocate(size);
+    }
+
+    static void operator delete(void* pdead, size_t size) {
+        return myAlloc.deallocate(pdead, size);
+    }
+}
+
+allocator Foo::myAlloc;
+```
+
+**demo4 用宏取代**
+
+## new handler
+```c++
+typedef void(*new_handler)();
+new_handler set_new_handler(new_handler p) throw();
+```
+
+## operator new 和 delete的 delete default 修饰符
+**delete** 不允许有的方法
+
+**default** 用默认版本
