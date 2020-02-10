@@ -85,3 +85,118 @@ delete[] buf;
 
 
 ## 重载
+```c++
+class Foo {
+public:
+  void* operator new(size_t);
+  void operator delete(void*, sizet_t);
+}
+```
+
+**demo1**
+```c++
+#include <iostream>
+#include <cstddef>
+using namespace std;
+
+class Screen {
+public:
+    Screen(int x): i(x) {};
+    int get() {return i;}
+
+    void* operator new(size_t);
+    void operator delete(void*, size_t);
+
+private:
+    Screen* next;  // 多耗用一个next指针
+    static Screen* freeStore;
+    static const int screenChunk;
+private:
+    int i;
+};
+
+Screen* screen::freeStore = 0;
+const int Screen::screenChunk = 24;
+
+void* Screen::operator new(size_t size) 
+{
+    Screen* p;
+    if (!freeStore) {
+        size_t chunk = screenChunk * size;
+
+        // 将一大块分割，当作linked list串起来
+        freeStore = p = reinterpret_cast<Screen*>(new char[chunk]);
+
+        for (; p != &freeStore[screenChunk - 1]; ++p) {
+            p->next = p + 1;
+        }
+
+        p->next = 0;
+    }
+
+    p = freeStore;
+    freeStore = freeStore->next;
+    return p;
+}
+
+void Screen::operator delete(void *p, size_t)
+{
+    // 将deleted object 插回free list前端
+    (static_cast<Screen*>(p))->next = freeStore;
+    freeStore = static_cast<Screen*>(p); 
+}
+```
+
+**demo2**
+```c++
+#include <iostream>
+#include <cstddef>
+using namespace std;
+
+class Screen {
+public:
+    Screen(int x): i(x) {};
+    int get() {return i;}
+
+    void* operator new(size_t);
+    void operator delete(void*, size_t);
+
+private:
+    Screen* next;  // 多耗用一个next指针
+    static Screen* freeStore;
+    static const int screenChunk;
+private:
+    int i;
+};
+
+Screen* screen::freeStore = 0;
+const int Screen::screenChunk = 24;
+
+void* Screen::operator new(size_t size) 
+{
+    Screen* p;
+    if (!freeStore) {
+        size_t chunk = screenChunk * size;
+
+        // 将一大块分割，当作linked list串起来
+        freeStore = p = reinterpret_cast<Screen*>(new char[chunk]);
+
+        for (; p != &freeStore[screenChunk - 1]; ++p) {
+            p->next = p + 1;
+        }
+
+        p->next = 0;
+    }
+
+    p = freeStore;
+    freeStore = freeStore->next;
+    return p;
+}
+
+void Screen::operator delete(void *p, size_t)
+{
+    // 将deleted object 插回free list前端
+    (static_cast<Screen*>(p))->next = freeStore;
+    freeStore = static_cast<Screen*>(p); 
+}
+```
