@@ -24,3 +24,41 @@ Container::~Component(...) { ... ~Container(...);}
 Container <>------> Component
 
 ### 委托 （Delegation） Composition by reference
+
+### 转换函数 conversion function
+
+### 智能指针
+
+### pointer like class
+
+### function like class
+
+### namespace
+
+### 类模板
+
+### 函数模版
+
+### 成员模版
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
